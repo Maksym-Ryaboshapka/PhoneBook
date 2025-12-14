@@ -14,6 +14,7 @@ import java.util.List;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
+
   private final JwtUtil jwtUtil;
 
   public JwtFilter(JwtUtil jwtUtil) {
@@ -24,20 +25,31 @@ public class JwtFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
     String header = request.getHeader("Authorization");
 
-    if (header != null && header.startsWith("Bearer ")) {
-      try {
-        String token = header.substring(7);
-        String login = jwtUtil.extractLogin(token);
+    if (header == null || !header.startsWith("Bearer ")) {
+      chain.doFilter(request, response);
+      return;
+    }
 
+    String token = header.substring(7);
+
+    try {
+      if (!jwtUtil.isValid(token)) {
+        chain.doFilter(request, response);
+        return;
+      }
+
+      String login = jwtUtil.extractLogin(token);
+
+      if (SecurityContextHolder.getContext().getAuthentication() == null) {
         UsernamePasswordAuthenticationToken auth =
                 new UsernamePasswordAuthenticationToken(login, null, List.of());
 
         SecurityContextHolder.getContext().setAuthentication(auth);
-      } catch (Exception e) {
-        SecurityContextHolder.clearContext();
       }
-    }
 
+    } catch (Exception e) {
+      SecurityContextHolder.clearContext();
+    }
 
     chain.doFilter(request, response);
   }
