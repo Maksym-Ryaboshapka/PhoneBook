@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  phonebook-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: spring-boot
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/postgres
+      SPRING_DATASOURCE_USERNAME: server
+      SPRING_DATASOURCE_PASSWORD: Password6767
