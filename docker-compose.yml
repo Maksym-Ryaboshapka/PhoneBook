@@ -5,13 +5,27 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-
-    container_name: spring-boot
-
+    container_name: phonebook_service
     ports:
       - "8080:8080"
-
+    depends_on:
+      - phonebook-db
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://phonebook-db:5432/phonebook_db
       SPRING_DATASOURCE_USERNAME: server
       SPRING_DATASOURCE_PASSWORD: Password6767
+
+  phonebook-db:
+    image: postgres:14-alpine
+    container_name: phonebook_db
+    environment:
+      POSTGRES_DB: phonebook_db
+      POSTGRES_USER: server
+      POSTGRES_PASSWORD: Password6767
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  db_data:
