@@ -8,8 +8,10 @@ services:
     container_name: phonebook_service
     ports:
       - "8080:8080"
+
     depends_on:
-      - phonebook-db
+      phonebook-db:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://phonebook-db:5432/phonebook_db
       SPRING_DATASOURCE_USERNAME: server
@@ -26,6 +28,13 @@ services:
       - db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U server -d phonebook_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
 volumes:
   db_data:
