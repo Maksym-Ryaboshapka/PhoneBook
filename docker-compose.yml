@@ -3,6 +3,7 @@ version: '3.8'
 services:
   phonebook-app:
     build: .
+    restart: always
     ports:
       - "8080:8080"
 
@@ -16,6 +17,8 @@ services:
 
   phonebook-db:
     image: postgres:14-alpine
+    restart: always
+
     environment:
       POSTGRES_DB: phonebook_db
       POSTGRES_USER: server
